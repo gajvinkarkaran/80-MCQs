@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IACE SI/Constable Mock Test - Reasoning</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        h1 {
+            color: #0056b3;
+            margin: 0 0 5px 0;
+            font-size: 24px;
+        }
+        p.subtitle {
+            color: #555;
+            margin: 0;
+            font-size: 14px;
+        }
+        .marking-rules {
+            background: #eef6ff;
+            border-left: 4px solid #0056b3;
+            padding: 10px 15px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .question-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .option-label:hover {
+            background: #f0f0f0;
+        }
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+        }
+        /* Color feedback styles */
+        .option-label.correct {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-label.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24;
+            font-weight: bold;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn-submit {
+            background-color: #0056b3;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-submit:hover {
+            background-color: #004085;
+        }
+        #result-board {
+            display: none;
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+        }
+        #result-board h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .score-details {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .score-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            min-width: 120px;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .score-box .num {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Gajvinkar Karan/Constable Super-100 Mock Test</h1>
+        <p class="subtitle">Reasoning: Series, Coding & Decoding</p>
+    </header>
+
+    <div class="marking-rules">
+        <strong>Exam Marking Scheme:</strong> Correct Answer: <strong>+1.00</strong> | Wrong Answer: <strong>-0.20</strong>
+    </div>
+
+    <form id="quizForm">
+        <div id="questionsContainer"></div>
+        <div class="controls">
+            <button type="button" class="btn-submit" onclick="evaluateExam()">Submit Exam</button>
+        </div>
+    </form>
+
+    <div id="result-board">
+        <h2>Performance Summary</h2>
+        <div class="score-details">
+            <div class="score-box">Total Questions<div class="num" id="res-total">80</div></div>
+            <div class="score-box">Attempted<div class="num" id="res-attempted">0</div></div>
+            <div class="score-box">Correct<div class="num" id="res-correct" style="color: #28a745;">0</div></div>
+            <div class="score-box">Incorrect<div class="num" id="res-wrong" style="color: #dc3545;">0</div></div>
+            <div class="score-box">Final Score<div class="num" id="res-score">0.00</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    { id: 1, text: "15, 63, 111, 159, ?, 255, 303", options: ["250", "218", "204", "207"], answer: 4 },
+    { id: 2, text: "122, 157, 225, 322, 397", options: ["162", "172", "192", "202"], answer: 4 },
+    { id: 3, text: "27, 38, 71, 126, 203, (?)", options: ["312", "302", "292", "272"], answer: 2 },
+    { id: 4, text: "413280, 59040, 9840, 1968, ?, 164, 82, 82", options: ["392", "492", "452", "357"], answer: 2 },
+    { id: 5, text: "GHI, NOP, ?, ZAB, EFG", options: ["RST", "STU", "STI", "TUV"], answer: 4 },
+    { id: 6, text: "48, 24, 24, 36, 72, 180, ?", options: ["360", "810", "450", "540"], answer: 4 },
+    { id: 7, text: "CNT, FQU, ITV, LWW, ?", options: ["OZX", "NYY", "MXZ", "LYX"], answer: 1 },
+    { id: 8, text: "16, 65, 261, 1045, 4181, ?", options: ["16945", "16273", "16725", "16892"], answer: 3 },
+    { id: 9, text: "LEDGE, JHBIC, ?, FNXPY, DQVSW", options: ["HMZKA", "HKZMA", "HKZAM", "HJZNA"], answer: 2 },
+    { id: 10, text: "5/7, 5/21, 5/21, 25/63, 25/27, ?", options: ["50/27", "25/9", "35/27", "5/9"], answer: 2 },
+    { id: 11, text: "202, 201, 209, 182, ?, 121", options: ["236", "200", "156", "246"], answer: 4 },
+    { id: 12, text: "PQPQPQPQ, RQPQPQPQ, RSPQPQPQ, RSRQPQPQ, RSRSPQPQ, ?", options: ["RSRSRSPQ", "PQPQPQPQ", "RQPQPQPQ", "RSRSRQPQ"], answer: 4 },
+    { id: 13, text: "14, 14.12, 14.25, 14.39, 14.54, ?", options: ["14.6", "14.7", "14.8", "14.9"], answer: 2 },
+    { id: 14, text: "D23EF1, F29E, F2, H31E2F3, ?, L41E4F5", options: ["K23EF", "K35EF", "J37E3F4", "J39E2F3"], answer: 3 },
+    { id: 15, text: "75, 291, 416, 480, 507, ?", options: ["511", "532", "521", "515"], answer: 4 },
+    { id: 16, text: "5, 17, 53, 161, ?, 1457", options: ["324", "412", "485", "441"], answer: 3 },
+    { id: 17, text: "229, 570, 1087, 1756, ?", options: ["1826", "2649", "2694", "1185"], answer: 3 },
+    { id: 18, text: "Find the wrong number: 13, 25, 39, 55, 73, 93, 119", options: ["39", "73", "93", "119"], answer: 4 },
+    { id: 19, text: "F43B, K48G, P53L, U58Q, ?", options: ["Y62U", "Z63V", "A63W", "Y63V"], answer: 2 },
+    { id: 20, text: "PRTV, OSUW, RTVX, ?", options: ["SUWY", "TVXZ", "TVZB", "SVXA"], answer: 1 },
+    { id: 21, text: "FPXD, H..., ?", options: ["H", "I", "J", "K"], answer: 3 },
+    { id: 22, text: "2.5, 3.5, 5, 18, 68, ?", options: ["352", "345", "340", "325"], answer: 2 },
+    { id: 23, text: "2, 18, 36, 358, 716, ?", options: ["7158", "1432", "7168", "1430"], answer: 1 },
+    { id: 24, text: "BDC, DHA, GLX, KPT, ?", options: ["PTB", "PTO", "LTO", "JTO"], answer: 2 },
+    { id: 25, text: "3, 15, 35, 63, 99, ?", options: ["27", "45", "143", "56"], answer: 3 },
+    { id: 26, text: "SURGE = 70, ATTIC = 53, HAND = ?", options: ["36", "29", "27", "34"], answer: 3 },
+    { id: 27, text: "LAUNCH = RZTODI, REDOUT = ?", options: ["SFEMBG", "QDCPVU", "SFEPVU", "QDCMBG"], answer: 2 },
+    { id: 28, text: "PIPE = 23, CLUB = 19, WIND = 25, LOST = ?", options: ["31", "33", "28", "24"], answer: 2 },
+    { id: 29, text: "TRIPOD = $@≠%?#, MENTOR = ≤#&$?@, PROTEIN = ?", options: ["%@#$¥≠&", "%@?$&≠&", "%@?&#≠&", "%@?$%≠&"], answer: 4 },
+    { id: 30, text: "DAMAGE = ECPXED, NATURE = ?", options: ["OCWVTH", "OCWSPD", "OCWRPD", "MYQRPD"], answer: 3 },
+    { id: 31, text: "English alphabet position question...", options: ["V", "X", "W", "I"], answer: 3 },
+    { id: 32, text: "#32$&' coding rule question", options: ["MFAYW", "MFFWY", "MFAWY", "AFMWY"], answer: 3 },
+    { id: 33, text: "PAS = 6, ALONG = 7, BORN = ?", options: ["8", "9", "7", "4"], answer: 1 },
+    { id: 34, text: "ACHIEVE = CFJLGYG, GRADUATE = ?", options: ["IUGWDDVH", "ICGUWDVH", "TUCGWDVH", "IUCGDWVH"], answer: 2 },
+    { id: 35, text: "Meaningful word from ALNCHU codes", options: ["214536", "342165", "312456", "216345"], answer: 4 },
+    { id: 36, text: "CLEAR = 15-5-19, PRIZE = 34-9-31, LUCID = ?", options: ["33-3-10", "32-3-12", "30-3-13", "43-3-13"], answer: 4 },
+    { id: 37, text: "BLOCK = ELUCT, FLANK = ILGNT, WHILE = ?", options: ["YHMLE", "ZHOLN", "YGOMN", "ZGOMH"], answer: 2 },
+    { id: 38, text: "APPRECIATE = PPRCT, MOTIVATION = ?", options: ["MTVN", "MOTVTN", "MTVTN", "MVTVTN"], answer: 3 },
+    { id: 39, text: "CERTAIN = 964382, UNCERTAIN = 964382117, U = ?", options: ["4", "17", "1", "6"], answer: 2 },
+    { id: 40, text: "GARMENTS = 2019132214719, INVASIVE = ?", options: ["1418518954", "181422268182222", "1814158955735", "1814519855"], answer: 2 },
+    { id: 41, text: "MANGO = 35, CHERRIES = 56, ADMINISTRATION = ?", options: ["98", "102", "96", "112"], answer: 1 },
+    { id: 42, text: "'invest efforts to energy' code?", options: ["hi bo mr fp", "ta nj yz rd", "ta fp ux nj", "ux ge nj hi"], answer: 4 },
+    { id: 43, text: "Decode QPMNQB", options: ["cought", "matery", "fights", "height"], answer: 4 },
+    { id: 44, text: "BRING = 50, STATE = 65, SWORD = ?", options: ["95", "79", "94", "81"], answer: 2 },
+    { id: 45, text: "SCHOOL = 3-19-15-8-12-15, THEORY = ?", options: ["8-20-15-25-5-18", "8-18-15-5-25-20", "8-20-15-5-25-18", "8-20-5-15-25-18"], answer: 2 },
+    { id: 46, text: "SAGE = -8, TABS = 0, VERB = ?", options: ["7", "4", "-4", "7"], answer: 1 },
+    { id: 47, text: "Code for 'things'?", options: ["ha", "tp", "ik", "mo"], answer: 2 },
+    { id: 48, text: "MASTER = OZVGII, CLIENT = EOLVRG, FUSION = ?", options: ["HFVRSM", "HXIWSR", "UFHIRM", "JUFHRSN"], answer: 1 },
+    { id: 49, text: "N = 2, KAW = 5, MAN = ?", options: ["6", "4", "2", "9"], answer: 2 },
+    { id: 50, text: "Code for 'clean'?", options: ["am", "to", "le", "de"], answer: 3 },
+    { id: 51, text: "67, 85, 121, 175, ?, 337", options: ["250", "247", "230", "256"], answer: 2 },
+    { id: 52, text: "14, 5, 243, 39, 167, ?", options: ["161", "240", "196", "284"], answer: 1 },
+    { id: 53, text: "D17, E15, G13, J11, ?", options: ["N9", "P6", "V5", "M10"], answer: 2 },
+    { id: 54, text: "18, 22, 48, 148, ?, 2984", options: ["596", "600", "602", "572"], answer: 1 },
+    { id: 55, text: "SIL, UER, WAX, ?, ASJ", options: ["UVE", "YWD", "YUC", "XVC"], answer: 2 },
+    { id: 56, text: "OEN 2, MHL 13, KKJ 25, JNH 38, GQF 52, ?", options: ["FUD 88", "ETD 67", "CTB 69", "ETF 66"], answer: 2 },
+    { id: 57, text: "LY 19, HD 27, DI 35, ZN 43, ?, RX 59", options: ["VS 51", "UP 51", "UP 61", "UO 57"], answer: 1 },
+    { id: 58, text: "9, 28, 126, 344, 1332, ?", options: ["2197", "2198", "2167", "2168"], answer: 2 },
+    { id: 59, text: "29, 31, 35, 43, 59, 91, ?", options: ["181", "175", "155", "150"], answer: 3 },
+    { id: 60, text: "Select wrong term: 2, 29, 154, 487, 1828, 4025", options: ["154", "487", "1828", "4025"], answer: 2 },
+    { id: 61, text: "CFIO, OTZC, SVZE, GJNS, ?", options: ["EHMQ", "EGKQ", "EHLQ", "EHKQ"], answer: 1 },
+    { id: 62, text: "20, 83, 162, 376, 515, ?", options: ["238", "259", "260", "261"], answer: 2 },
+    { id: 63, text: "TB, ?, MDP, MFLP, MBTI", options: ["NCRG", "MCRG", "MCTG", "MCRH"], answer: 2 },
+    { id: 64, text: "8, 12, 18, 27, ?, 60.75", options: ["40.5", "41", "39", "42"], answer: 1 },
+    { id: 65, text: "NMQR, NOYD, NUGP, NYOB, ?", options: ["NQRC", "NMWN", "NCWN", "NWRQ"], answer: 3 },
+    { id: 66, text: "NOT = 9, LAP = -3, TIN = ?", options: ["43", "25", "15", "34"], answer: 3 },
+    { id: 67, text: "CAKE = DCNI, SANK = ?", options: ["TCQO", "TDQO", "TCOP", "TDQP"], answer: 1 },
+    { id: 68, text: "GRABPONT = NTIVVGLM, TMVLRBDE = ?", options: ["VJVYFBGZ", "YJUXFBGZ", "YJVXFBGZ", "YJVXFBHG"], answer: 3 },
+    { id: 69, text: "KINGDOM = MODGNIK, LEADING = GNIDAEL, PRIVACY = ?", options: ["YDAVIRP", "YCATIRP", "YCAVIRP", "YCAVISP"], answer: 3 },
+    { id: 70, text: "WOMAN = PXOOB, DREAM = ?", options: ["ESGDP", "ESGBN", "SEGNB", "SEGPD"], answer: 3 },
+    { id: 71, text: "Form a meaningful word using letter codes (RESANTO)", options: ["3754621", "3254671", "3452617", "2354761"], answer: 1 },
+    { id: 72, text: "BLAME = NDXGO, CREAM = ?", options: ["TEBOC", "TEHOC", "ETBCO", "ETHCO"], answer: 1 },
+    { id: 73, text: "'looks' code?", options: ["kl", "gc", "yz", "vb"], answer: 4 },
+    { id: 74, text: "PENCIL = 1771771418, SHARPNER = ?", options: ["93151219645901", "201042221201227", "201042221201224", "201042221201223"], answer: 1 },
+    { id: 75, text: "DEAR = S26C, VALUE = F586U, VITAL = ?", options: ["M462W", "N492U", "M466U", "M482U"], answer: 4 },
+    { id: 76, text: "MUMBAI = LVLABJ, KOLKATA = ?", options: ["JPKJBVB", "IPJIBRB", "JPKJBSB", "IPIJRB"], answer: 3 },
+    { id: 77, text: "ABOMINATION code?", options: ["93151219645901", "93151219654901", "93152196145901", "93152119645901"], answer: 4 },
+    { id: 78, text: "FAT = 6260, GIR = ?", options: ["1418", "88154", "141840", "14918"], answer: 1 },
+    { id: 79, text: "FELLOW = FDNLNY, GOLDEN = ?", options: ["GNNEDQ", "DNNDDQ", "GNNDDP", "GNNDEP"], answer: 3 },
+    { id: 80, text: "PARTS = 73, BRICK = 34, MOUTH = ?", options: ["55", "41", "76", "32"], answer: 2 }
+];
+
+function renderQuestions() {
+    const container = document.getElementById("questionsContainer");
+    let html = "";
+    quizData.forEach((q, index) => {
+        html += `
+        <div class="question-card" id="card-${q.id}">
+            <div class="question-title">Q${q.id}. ${q.text}</div>
+            <div class="options-group">
+                ${q.options.map((opt, optIdx) => `
+                    <label class="option-label" id="label-${q.id}-${optIdx + 1}">
+                        <input type="radio" name="q${q.id}" value="${optIdx + 1}" onchange="markOption(${q.id}, ${optIdx + 1}, ${q.answer})">
+                        ${optIdx + 1}) ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function markOption(qId, selectedOpt, correctOpt) {
+    // Reset background styles for current question options
+    for (let i = 1; i <= 4; i++) {
+        const lbl = document.getElementById(`label-${qId}-${i}`);
+        lbl.classList.remove('correct', 'incorrect');
+    }
+
+    const selectedLabel = document.getElementById(`label-${qId}-${selectedOpt}`);
+    if (selectedOpt === correctOpt) {
+        selectedLabel.classList.add('correct');
+    } else {
+        selectedLabel.classList.add('incorrect');
+        // Show correct answer in green as well
+        const correctLabel = document.getElementById(`label-${qId}-${correctOpt}`);
+        correctLabel.classList.add('correct');
+    }
+}
+
+function evaluateExam() {
+    let attempted = 0;
+    let correct = 0;
+    let wrong = 0;
+
+    quizData.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if (selected) {
+            attempted++;
+            if (parseInt(selected.value) === q.answer) {
+                correct++;
+            } else {
+                wrong++;
+            }
+        }
+    });
+
+    const totalScore = (correct * 1.0) - (wrong * 0.20);
+
+    document.getElementById("res-attempted").innerText = attempted;
+    document.getElementById("res-correct").innerText = correct;
+    document.getElementById("res-wrong").innerText = wrong;
+    document.getElementById("res-score").innerText = totalScore.toFixed(2);
+    document.getElementById("result-board").style.display = "block";
+
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+// Initialize test on load
+renderQuestions();
+</script>
+
+</body>
+</html>
